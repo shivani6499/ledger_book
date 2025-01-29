@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/register.css">
+</head>
+<body style="background-image: url('/views/image/image1.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
+
+    <div class="register-container">
+        <h2>Register</h2>
+        <form id="register-form" action="/api/register" method="POST">
+            <input type="text" name="username" id="username" placeholder="Username" required>
+            <input type="password" name="password" id="password" placeholder="Password" required>
+            <button type="submit">Register</button>
+        </form>
+
+        <p style="
+        font-size: 14px;
+    ">Already have an account? <a href="/login">Login</a></p>
+    </div>
+
+    <script>
+        // Function to handle form submission
+        async function handleRegister(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                alert('Please fill out both username and password.');
+                return;
+            }
+
+            const registerData = {
+                username: username,
+                password: password
+            };
+
+            try {
+                // Send POST request to the backend API
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(registerData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Registration successful!');
+                    window.location.href = '/login'; 
+                } else {
+                    alert(data.message || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during registration:', error);
+                alert('An error occurred during registration. Please try again later.');
+            }
+        }
+
+        // Attach the form submission event to the register form
+        document.getElementById('register-form').addEventListener('submit', handleRegister);
+    </script>
+</body>
+</html>

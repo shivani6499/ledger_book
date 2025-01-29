@@ -1,0 +1,159 @@
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    margin-left: 38px;
+    margin-right: 25px;
+  }  .navbar {
+background-color: #1976d2; /* Primary blue color */
+border-radius: 10px; /* Rounded corners */
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow effect */
+margin-top: 20px; /* Add space above the navbar */
+margin-left: 35px;
+margin-right: 35px;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+    color: white !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    letter-spacing: 1px !important;
+  }
+  
+
+.navbar .nav-link {
+padding: 10px 15px;
+transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.navbar .nav-link:hover {
+color: #0288d1; /* Lighter blue on hover */
+background-color: rgba(255, 255, 255, 0.2); /* Slight white background on hover */
+border-radius: 6px; /* Rounded corners on hover */
+}
+
+/* Toggler Button Styling (for mobile) */
+.navbar-toggler-icon {
+background-color: white; /* Change toggle icon color */
+border-radius: 5px;
+}
+
+
+/* Table styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+/* Styling for Particulars */
+th:first-child, td:first-child {
+  width: 50%;
+}
+
+/* Styling for Debit, Credit, and Balance */
+th:nth-child(2), td:nth-child(2) {
+  text-align: right;
+  font-size: 14px; /* Small size for Debit */
+}
+
+th:nth-child(3), td:nth-child(3) {
+  text-align: right;
+  font-size: 14px; /* Small size for Credit */
+}
+
+th:nth-child(4), td:nth-child(4) {
+  text-align: right;
+  font-size: 14px; /* Small size for Balance */
+}
+
+/* Left align for Particular Detail Data */
+
+
+/* Optional: Style for odd rows */
+tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Navbar Collapse Styling */
+.navbar-collapse {
+padding: 5px;
+}
+
+/* Navbar mobile behavior */
+@media (max-width: 768px) {
+.navbar {
+  border-radius: 0; /* Remove rounded corners on mobile */
+}
+.navbar-nav {
+  text-align: center;
+  width: 100%;
+}
+.navbar .nav-item {
+  margin-bottom: 10px;
+}
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff; /* White background for the table */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+  border-radius: 8px; /* Rounded corners */
+  overflow: hidden; /* Ensures rounded corners work with borders */
+}
+
+/* Table Header */
+table thead th {
+  padding: 5px 10px !important; 
+  text-align: center;
+  font-size: 14px; /* Smaller font size for headers */
+  font-weight: bold;
+  color: white; /* White text for header */
+  background-color: #1976d2; /* Blue background */
+  border: 1px solid #ddd; /* Optional: border for header cells */
+}
+
+/* Table Body */
+table tbody td {
+  padding: 8px 10px !important; /* Adjust padding for a cleaner look */
+  text-align: center;
+  font-size: 13px; /* Smaller font size for body cells */
+  color: #333; /* Dark text for body */
+  border: 1px solid #ddd; /* Border for body cells */
+}
+
+/* Alternating Row Colors */
+table tbody tr:nth-child(even) {
+  background-color: #f4f6f9; /* Light gray background for even rows */
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* White background for odd rows */
+}
+
+/* Hover Effect */
+table tbody tr:hover {
+  background-color: #e3f2fd; /* Light blue on hover */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+  

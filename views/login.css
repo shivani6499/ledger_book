@@ -1,0 +1,134 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('/images/image3.jpg'); /* Image path inside public folder */
+    background-size: cover; /* Make the image cover the entire screen */
+    background-position: center;
+    background-attachment: fixed; /* Keep the background fixed while scrolling */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+
+/* Fade-in animation for the body */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.85); /* White with slight transparency */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+    animation: slideUp 1s ease-out;
+}
+
+/* Slide-up animation for the login container */
+@keyframes slideUp {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+h2 {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #1976d2;
+    animation: fadeInText 1.5s ease-out;
+}
+
+/* Fade-in animation for the heading */
+@keyframes fadeInText {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Form Fields */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInText 1.5s ease-out;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #1976d2; /* Blue border on focus */
+    outline: none;
+    box-shadow: 0 0 5px rgba(25, 118, 210, 0.5);
+}
+
+/* Submit Button */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #1976d2;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    animation: fadeInText 1.5s ease-out;
+}
+
+button:hover {
+    background-color: #1565c0; /* Darker blue on hover */
+    transform: translateY(-2px);
+    margin-bottom: 10px;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+/* Links */
+a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #1565c0;
+    text-decoration: underline;
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
+    .login-container {
+        width: 90%;
+    }
+}

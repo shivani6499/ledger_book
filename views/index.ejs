@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ledger Book</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    /* Container to hold buttons horizontally */
+    .button-container {
+      display: flex; /* Use flexbox to arrange buttons horizontally */
+      gap: 10px; /* Add space between the buttons */
+    }
+
+    /* Style for buttons in the actions cell */
+    .actions-cell button {
+      width: 120px; /* Same width for both buttons */
+      padding: 8px; /* Same padding for both */
+      margin: 5px; /* Optional: Space between buttons */
+      border: none; /* Remove border */
+      border-radius: 5px; /* Optional: Rounded corners */
+      cursor: pointer; /* Change cursor to pointer */
+      text-align: center; /* Center text inside the button */
+      font-size: 14px; /* Same font size */
+    }
+
+    /* Specific styles for the "View Details" button */
+    .view-details-btn {
+      background-color: #4caf50; /* Green for View Details */
+      color: white; /* White text */
+    }
+
+    /* Specific styles for the "Delete" button */
+    .delete-btn {
+      background-color: #f44336; /* Red for Delete */
+      color: white; /* White text */
+    }
+
+    /* Hover effects for buttons */
+    button:hover {
+      opacity: 0.8; /* Slightly fade the button on hover */
+    }
+
+    table tbody td {
+      position: relative;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      background-color: #ffffff;
+      color: #000000;
+      border: 1px solid #1976d2;
+      border-radius: 5px;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus {
+      outline: none;
+    }
+
+    input[type="text"]:active,
+    input[type="number"]:active,
+    input[type="date"]:active {
+      background-color: #b3d9ff;
+      border-color: #1976d2;
+    }
+
+    .editable:focus {
+      outline: none;
+      background-color: transparent !important;
+      color: inherit;
+    }
+
+    table tbody td:hover::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background-color: #007bff;
+      border-radius: 0 5px 5px 0;
+    }
+
+    .table td[data-field="debit"] {
+      background-color: #e0f7e0;
+    }
+
+    .table td[data-field="debit"]:not(:empty) {
+      background-color: #ffebeb;
+    }
+
+    .table td[data-field="credit"] {
+      background-color: #e0f9e0;
+    }
+
+    .table .total-row {
+      font-weight: bold;
+    }
+
+    .table .total-row .debit-total {
+      color: red;
+    }
+
+    .table .total-row .credit-total {
+      color: green;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    #ledgerTable tbody tr td:nth-child(2) {
+      background-color: #ffe6e6;
+      color: #ff0000;
+      font-weight: bold;
+    }
+
+    #ledgerTable tbody tr td:nth-child(4) {
+      background-color: #e6ffe6;
+      color: #008000;
+      font-weight: bold;
+    }
+
+    .tracker-container {
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .expense-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    /* .edit-btn,
+    .delete-btn {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      margin-right: 5px;
+      border-radius: 3px;
+    }
+    
+    .edit-btn:hover,
+    .delete-btn:hover {
+      background-color: #45a049;
+    }
+    
+    .edit-btn:active,
+    .delete-btn:active {
+      transform: scale(0.98);
+    } */
+
+    input {
+      border-color: #ccc;
+    }
+
+    input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .navbar {
+      background-color: #1976d2; /* Primary blue color */
+      border-radius: 10px; /* Rounded corners */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow effect */
+      margin-top: 20px; /* Add space above the navbar */
+    }
+
+    .navbar .navbar-brand,
+    .navbar .nav-link {
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 1px; /* Adds spacing between letters */
+    }
+
+    .navbar .nav-link {
+      padding: 10px 15px;
+      transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+    }
+
+    .navbar .nav-link:hover {
+      color: #0288d1; /* Lighter blue on hover */
+      background-color: rgba(
+        255,
+        255,
+        255,
+        0.2
+      ); /* Slight white background on hover */
+      border-radius: 6px; /* Rounded corners on hover */
+    }
+
+    /* Toggler Button Styling (for mobile) */
+    .navbar-toggler-icon {
+      background-color: white; /* Change toggle icon color */
+      border-radius: 5px;
+    }
+
+    /* Navbar Collapse Styling */
+    .navbar-collapse {
+      padding: 5px;
+    }
+
+    /* Navbar mobile behavior */
+    @media (max-width: 768px) {
+      .navbar {
+        border-radius: 0; /* Remove rounded corners on mobile */
+      }
+      .navbar-nav {
+        text-align: center;
+        width: 100%;
+      }
+      .navbar .nav-item {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+  <style>
+    .header-left input[type="date"] {
+      width: 199px;
+      padding: 5px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      height: 31px;
+      outline: none;
+    }
+
+    .header-left input[type="date"]:focus {
+      border-color: #0288d1;
+    }
+
+    .table td,
+    .table th {
+      padding-top: 6px;
+      padding-bottom: 5px;
+      padding-left: 11px;
+      padding-right: 0;
+      vertical-align: top;
+      border-top: 1px solid #b3d9ff;
+    }
+
+    th {
+      background-color: #1976d2;
+      color: #ffffff;
+      text-align: left;
+      border: 1px solid #ccc;
+      padding: 5px;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .header-right {
+      margin-right: 15px;
+    }
+
+    .header-field {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+    }
+
+    .header-field label {
+      font-size: 14px;
+      color: #1976d2;
+    }
+
+    .header-field input {
+      width: 200px;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .header-field input:focus {
+      border-color: #0288d1;
+    }
+
+    @media (max-width: 768px) {
+      .header-left {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+    .able td,
+    .table th {
+      margin: 0px;
+    }
+    .header-left {
+      width: 40%;
+
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .header-field {
+      margin-bottom: 10px;
+    }
+
+    .header-field label {
+      display: inline-block;
+      width: 150px;
+      text-align: left;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+
+    .header-field input {
+      width: 200px;
+      padding: 6px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .header-field input:focus {
+      border-color: #0288d1;
+      outline: none;
+    }
+
+    body {
+      font-family: "Arial", sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      margin-left: 38px;
+      margin-right: 25px;
+    }
+
+    .container {
+      background-color: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 20px auto;
+      overflow-x: hidden;
+    }
+
+    .header-section {
+      width: 96vw;
+      height: 146px;
+    }
+
+    .header-left div {
+      margin: 5px 0;
+    }
+
+    .header-right input {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background-color: #1976d2;
+      color: #ffffff;
+      text-align: left;
+      border: 1px solid #ccc;
+    }
+
+    td {
+      padding: 5px;
+      text-align: left;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #e0f7fa;
+    }
+
+    td input[type="text"],
+    td input[type="number"],
+    td input[type="date"] {
+      width: 100%;
+      padding: 6px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-left: -4px;
+    }
+
+    .filter-input {
+      display: none;
+      width: 100%;
+      padding: 5px;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    th {
+      position: relative;
+    }
+
+    th i {
+      font-size: 14px;
+      cursor: pointer;
+      margin-left: 5px;
+      color: white;
+    }
+
+    th i:hover {
+      color: #1565c0;
+    }
+
+    .total-row {
+      font-weight: bold;
+      background-color: #b3d9ff;
+      color: #333;
+    }
+
+    .debit-total,
+    .credit-total {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .debit-total::before {
+      content: "₹ ";
+      color: red;
+    }
+
+    .credit-total::before {
+      content: "₹ ";
+      color: green;
+    }
+
+    .btn-success {
+      /* background-color: #1976d2; */
+      color: white;
+      border: none;
+      padding: 9px 36px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    td[data-field="debit"] {
+      color: red;
+    }
+
+    td[data-field="credit"] {
+      color: green;
+    }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1976d2;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      background-color: #b3d9ff;
+      border-radius: 8px;
+    }
+
+    .header-left div {
+      margin: 5px 0;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .header-left div:first-child {
+      font-size: 15px;
+      color: #333;
+    }
+
+    .header-right input {
+      border: 1px solid #1976d2;
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-size: 14px;
+      transition: border 0.3s ease;
+    }
+
+    .header-right input:focus {
+      border-color: #0288d1;
+      outline: none;
+    }
+
+    @media (max-width: 768px) {
+      .header-section {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .header-left {
+        margin-bottom: 10px;
+      }
+    }
+
+    table th:nth-child(1),
+    table td:nth-child(1) {
+      width: 30%;
+    }
+
+    table th:nth-child(2),
+    table td:nth-child(2) {
+      width: 10%;
+    }
+
+    table th:nth-child(3),
+    table td:nth-child(3) {
+      width: 30%;
+    }
+
+    table th:nth-child(4),
+    table td:nth-child(4) {
+      width: 10%;
+    }
+
+    table th:nth-child(5),
+    table td:nth-child(5) {
+      width: 10%;
+    }
+
+    .filter-input {
+      width: 90%;
+    }
+
+    .filter-input {
+      display: none;
+      width: 100%;
+      padding: 5px;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+  </style>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <a class="navbar-brand" href="#">Ledger Book</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="#"
+              onclick="showLedger()"
+              style="color: white"
+              >Ledger</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/trial-balance" style="color: white"
+              >Trial Balance</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Ledger Container -->
+    <div class="container" id="ledgerContainer" style="display: none">
+      <!-- Ledger Section -->
+      <div class="header-section">
+        <div class="header-left" style="display: flex">
+          <!-- Book Input -->
+          <div class="left-section">
+            <div>
+              <div>Book:</div>
+              <input
+                type="text"
+                id="bookInput"
+                class="input-field"
+                placeholder="Enter book name"
+              />
+            </div>
+            <div>
+              <div>Opening Balance: ₹</div>
+              <input
+                type="number"
+                id="balanceInput"
+                class="input-field"
+                placeholder="Auto-filled"
+                readonly
+              />
+            </div>
+          </div>
+          <div class="right-section">
+            <div>
+              <div>Page No:</div>
+              <input
+                type="number"
+                id="pageInput"
+                class="input-field"
+                placeholder="Enter page number"
+              />
+            </div>
+            <div>
+              <div>Date:</div>
+              <input type="date" id="dateInput" class="input-field" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ledger Table -->
+      <table id="ledgerTable" class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Particulars</th>
+            <th>Debit</th>
+            <th>Particulars 2</th>
+            <th>Credit</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerTableBody"></tbody>
+      </table>
+
+      <button onclick="addNewRow()" class="btn btn-success">Add New Row</button>
+      <button onclick="saveLedgerData()" class="btn btn-primary">
+        Save Ledger Data
+      </button>
+
+      <!-- Tracker Section -->
+      <div class="tracker-container">
+        <table class="expense-table">
+          <thead>
+            <tr>
+              <th>Book</th>
+              <th>Page</th>
+              <th>Total Credit</th>
+              <th>Total Debit</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="expense-table-body">
+            <!-- Table rows will be inserted here dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function showLedger() {
+        document.getElementById("ledgerContainer").style.display = "block";
+      }
+
+      function hideLedger() {
+        document.getElementById("ledgerContainer").style.display = "none";
+      }
+
+      function addNewRow() {
+        // Logic for adding a new row
+        alert("Add New Row logic goes here.");
+      }
+
+      function saveLedgerData() {
+        // Logic for saving ledger data
+        alert("Save Ledger Data logic goes here.");
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/script.js"></script>
+  </body>
+</html>

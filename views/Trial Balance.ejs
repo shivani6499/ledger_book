@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <title>Trial Balance</title> -->
+    <link rel="stylesheet" href="Trial-Balance.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css"
+    />
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <a class="navbar-brand" href="#">Ledger Book</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="/user/1#"
+              onclick="showLedger()"
+              style="color: white"
+              >Ledger</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/trial-balance" style="color: white"
+              >Trial Balance</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Voucher Section -->
+    <div class="container mt-5">
+      <!-- Date Filter Form -->
+      <form id="dateFilterForm" class="form-inline justify-content-center mt-4">
+        <div class="form-group mx-2">
+          <label for="fromDate" class="mr-2">From Date:</label>
+          <input type="date" id="fromDate" class="form-control" required />
+        </div>
+        <div class="form-group mx-2">
+          <label for="toDate" class="mr-2">To Date:</label>
+          <input type="date" id="toDate" class="form-control" required />
+        </div>
+        <button
+          type="button"
+          class="btn btn-primary mx-2"
+          onclick="filterVouchers()"
+        >
+          Submit
+        </button>
+      </form>
+
+      <!-- Voucher Table -->
+      <table class="table table-bordered mt-4">
+        <thead>
+          <tr>
+            <th>Particulars</th>
+            <th>Debit</th>
+            <th>Credit</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody id="voucherTableBody">
+          <!-- Dynamic content will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      // Function to fetch vouchers based on the selected date range
+      function filterVouchers() {
+        const fromDate = document.getElementById("fromDate").value;
+        const toDate = document.getElementById("toDate").value;
+
+        if (!fromDate || !toDate) {
+          alert("Please select both dates.");
+          return;
+        }
+
+        // API URL with query parameters
+        const apiUrl = `/api/voucher/grouped?startDate=${fromDate}&endDate=${toDate}`;
+
+        // Fetch the data from the server
+        fetch(apiUrl)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            const tableBody = document.getElementById("voucherTableBody");
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            if (
+              data &&
+              data.groupedVouchers &&
+              data.groupedVouchers.length > 0
+            ) {
+              // Populate table rows with voucher data
+              data.groupedVouchers.forEach((voucher) => {
+                const row = `
+              <tr>
+                <td>${voucher.particulars}</td>
+                <td>${voucher.debit.toFixed(2)}</td>
+                <td>${voucher.credit.toFixed(2)}</td>
+                <td>${voucher.balance.toFixed(2)}</td>
+              </tr>
+            `;
+                tableBody.innerHTML += row;
+              });
+            } else {
+              // Show message if no vouchers are found
+              tableBody.innerHTML =
+                "<tr><td colspan='4'>No vouchers found for the selected dates.</td></tr>";
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching vouchers:", error);
+            alert("An error occurred while fetching the voucher data.");
+          });
+      }
+    </script>
+  </body>
+</html>
