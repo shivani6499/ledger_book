@@ -14,14 +14,11 @@ const fetchDataAndRender = async () => {
 };
 const renderTable = (data) => {
   const tableBody = document.getElementById("expense-table-body");
-
-  // Clear any previous data
   tableBody.innerHTML = "";
 
   data.forEach((item) => {
     const row = document.createElement("tr");
 
-    // Create cells for each row
     const bookCell = document.createElement("td");
     bookCell.textContent = item.book;
 
@@ -41,40 +38,32 @@ const renderTable = (data) => {
     );
 
     const actionsCell = document.createElement("td");
-
-    // Buttons for actions (View Details & Delete)
     actionsCell.innerHTML = `
       <button class="action-btn view-details-btn" data-book="${item.book}" data-page-no="${item.pageNo}">Details</button>
       <button class="action-btn delete-btn" data-book="${item.book}" data-page-no="${item.pageNo}">Delete</button>
     `;
 
-    // Append cells to the row
     row.appendChild(bookCell);
     row.appendChild(pageCell);
     row.appendChild(totalCreditCell);
     row.appendChild(totalDebitCell);
     row.appendChild(actionsCell);
 
-    // Append the row to the table body
     tableBody.appendChild(row);
   });
 
-  // Attach event listener for view details buttons
   document.querySelectorAll(".view-details-btn").forEach((button) => {
     button.addEventListener("click", (event) => {
-      const book = event.target.dataset.book; // Get the book from the button's data attribute
-      const pageNo = event.target.dataset.pageNo; // Get the page number from the button
-      viewDetails(book, pageNo); // Call the viewDetails function with book and pageNo
+      const book = event.target.dataset.book; 
+      const pageNo = event.target.dataset.pageNo; 
+      viewDetails(book, pageNo); 
     });
   });
 
-  // Attach event listener for delete buttons
   document.querySelectorAll(".delete-btn").forEach((button) => {
     button.addEventListener("click", (event) => {
       const book = event.target.dataset.book;
       const pageNo = event.target.dataset.pageNo;
-
-      // Call the delete function
       deleteLedgerEntry(book, pageNo);
     });
   });
@@ -84,26 +73,22 @@ const renderTable = (data) => {
 const viewDetails = async (book, pageNo) => {
   try {
     console.log(`Requesting details for book: ${book}, page: ${pageNo}`);
-
-    // Fetch ledger data based on book and pageNo
     const response = await fetch(`/api/ledger/${book}/${pageNo}`);
     const data = await response.json();
 
     if (data.openingBalance !== undefined) {
-      // Set the opening balance
       document.getElementById("balanceInput").value = data.openingBalance;
 
       if (data.data.length === 0) {
         if (parseInt(pageNo) === 1) {
-          // Handle the case for the first page with no data
           alert(
             "No data found for the first page and book. Starting with zero balances."
           );
-          document.getElementById("dateInput").value = ""; // Clear the date input
-          document.getElementById("bookInput").value = book; // Set the book input
-          document.getElementById("pageInput").value = pageNo; // Set the page input
-          document.getElementById("debitTotal").textContent = "0.00"; // Display zero debit
-          document.getElementById("creditTotal").textContent = "0.00"; // Display zero credit
+          document.getElementById("dateInput").value = ""; 
+          document.getElementById("bookInput").value = book; 
+          document.getElementById("pageInput").value = pageNo; 
+          document.getElementById("debitTotal").textContent = "0.00"; 
+          document.getElementById("creditTotal").textContent = "0.00";
           addNewRow(); // Optionally add a new row for user entry
         }
         // else {

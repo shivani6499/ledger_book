@@ -1,6 +1,5 @@
-// Function to handle form submission
 async function handleLogin(event) {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault(); n
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
@@ -16,7 +15,6 @@ async function handleLogin(event) {
     };
 
     try {
-        // Send POST request to the backend API
         const response = await fetch('/api/login', {
             method: 'POST',
             headers: {
@@ -29,10 +27,8 @@ async function handleLogin(event) {
 
         if (response.ok) {
             alert('Login successful!');
-            // Redirect to user-specific page using the received userId
             window.location.href = `/user/${data.userId}`;
         } else {
-            // If login failed, show error message
             alert(data.message || 'Login failed. Please try again.');
         }
     } catch (error) {
@@ -41,5 +37,4 @@ async function handleLogin(event) {
     }
 }
 
-// Attach the form submission event to the login form
 document.getElementById('login-form').addEventListener('submit', handleLogin);

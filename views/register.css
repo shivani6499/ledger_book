@@ -1,122 +1,110 @@
 body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-image: url('/views/image/image1.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-image: url("/views/image/image1.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
-
-/* Registration container */
 .register-container {
-    width: 300px;
-    margin: 100px auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 1s ease-out;
+  width: 300px;
+  margin: 100px auto;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1s ease-out;
 }
 
-/* Heading */
 h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    color: #333;
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    opacity: 0;
-    animation: fadeIn 1s 0.5s forwards;
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  opacity: 0;
+  animation: fadeIn 1s 0.5s forwards;
 }
 
-/* Input styling */
 input {
-    width: 91%;
-    padding: 12px;
-    margin: 12px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.3s ease;
+  width: 91%;
+  padding: 12px;
+  margin: 12px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
 }
 
-/* Input focus effect */
 input:focus {
-    border-color: #1976d2;
-    box-shadow: 0 0 5px rgba(25, 118, 210, 0.5);
-    outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 5px rgba(25, 118, 210, 0.5);
+  outline: none;
 }
 
-/* Button styling */
 button {
-    width: 100%;
-    padding: 12px;
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+  width: 100%;
+  padding: 12px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-/* Button hover and active states */
 button:hover {
-    background-color: #1565c0;
-    transform: translateY(-3px);
+  background-color: #1565c0;
+  transform: translateY(-3px);
 }
 
-/* Button active state */
 button:active {
-    transform: translateY(2px);
+  transform: translateY(2px);
 }
 
-/* Registration link */
 p {
-    text-align: center;
+  text-align: center;
 }
 
 a {
-    color: #1976d2;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
 }
 
-/* Hover effect on the link */
 a:hover {
-    color: #1565c0;
+  color: #1565c0;
 }
 
-/* Fade-in animation for the entire page */
 @keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
-/* Responsive adjustments */
 @media (max-width: 600px) {
-    .register-container {
-        width: 80%;
-        margin: 50px auto;
-        padding: 20px;
-    }
+  .register-container {
+    width: 80%;
+    margin: 50px auto;
+    padding: 20px;
+  }
 
-    h2 {
-        font-size: 20px;
-    }
+  h2 {
+    font-size: 20px;
+  }
 
-    input {
-        font-size: 14px;
-    }
+  input {
+    font-size: 14px;
+  }
 
-    button {
-        font-size: 14px;
-    }
+  button {
+    font-size: 14px;
+  }
 }

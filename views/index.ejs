@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ledger Book</title>
-    <!-- <link rel="stylesheet" href="styles.css"> -->
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -15,13 +14,11 @@
     />
   </head>
   <style>
-    /* Container to hold buttons horizontally */
     .button-container {
-      display: flex; /* Use flexbox to arrange buttons horizontally */
-      gap: 10px; /* Add space between the buttons */
+      display: flex;
+      gap: 10px;
     }
 
-    /* Style for buttons in the actions cell */
     .actions-cell button {
       width: 120px; /* Same width for both buttons */
       padding: 8px; /* Same padding for both */
@@ -33,19 +30,16 @@
       font-size: 14px; /* Same font size */
     }
 
-    /* Specific styles for the "View Details" button */
     .view-details-btn {
       background-color: #4caf50; /* Green for View Details */
       color: white; /* White text */
     }
 
-    /* Specific styles for the "Delete" button */
     .delete-btn {
       background-color: #f44336; /* Red for Delete */
       color: white; /* White text */
     }
 
-    /* Hover effects for buttons */
     button:hover {
       opacity: 0.8; /* Slightly fade the button on hover */
     }
@@ -160,27 +154,6 @@
       border-bottom: 1px solid #ddd;
     }
 
-    /* .edit-btn,
-    .delete-btn {
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      margin-right: 5px;
-      border-radius: 3px;
-    }
-    
-    .edit-btn:hover,
-    .delete-btn:hover {
-      background-color: #45a049;
-    }
-    
-    .edit-btn:active,
-    .delete-btn:active {
-      transform: scale(0.98);
-    } */
-
     input {
       border-color: #ccc;
     }
@@ -191,10 +164,10 @@
     }
 
     .navbar {
-      background-color: #1976d2; /* Primary blue color */
-      border-radius: 10px; /* Rounded corners */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow effect */
-      margin-top: 20px; /* Add space above the navbar */
+      background-color: #1976d2;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
     }
 
     .navbar .navbar-brand,
@@ -202,40 +175,31 @@
       color: white;
       font-size: 16px;
       font-weight: bold;
-      letter-spacing: 1px; /* Adds spacing between letters */
+      letter-spacing: 1px;
     }
 
     .navbar .nav-link {
       padding: 10px 15px;
-      transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+      transition: background-color 0.3s ease;
     }
 
     .navbar .nav-link:hover {
-      color: #0288d1; /* Lighter blue on hover */
-      background-color: rgba(
-        255,
-        255,
-        255,
-        0.2
-      ); /* Slight white background on hover */
-      border-radius: 6px; /* Rounded corners on hover */
+      color: #0288d1;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
     }
 
-    /* Toggler Button Styling (for mobile) */
     .navbar-toggler-icon {
-      background-color: white; /* Change toggle icon color */
+      background-color: white;
       border-radius: 5px;
     }
-
-    /* Navbar Collapse Styling */
     .navbar-collapse {
       padding: 5px;
     }
 
-    /* Navbar mobile behavior */
     @media (max-width: 768px) {
       .navbar {
-        border-radius: 0; /* Remove rounded corners on mobile */
+        border-radius: 0;
       }
       .navbar-nav {
         text-align: center;
@@ -477,7 +441,6 @@
     }
 
     .btn-success {
-      /* background-color: #1976d2; */
       color: white;
       border: none;
       padding: 9px 36px;
@@ -541,31 +504,29 @@
       }
     }
     table th:nth-child(1),
-table td:nth-child(1),
-table th:nth-child(4),
-table td:nth-child(4) {
-  width: 21%; /* Increase width for "Particulars" columns */
-}
+    table td:nth-child(1),
+    table th:nth-child(4),
+    table td:nth-child(4) {
+      width: 21%;
+    }
 
-table th:nth-child(2),
-table td:nth-child(2),
-table th:nth-child(5),
-table td:nth-child(5) {
-  width: 10%; /* Keep Narration smaller */
-}
+    table th:nth-child(2),
+    table td:nth-child(2),
+    table th:nth-child(5),
+    table td:nth-child(5) {
+      width: 10%;
+    }
 
-table th:nth-child(3),
-table td:nth-child(3),
-table th:nth-child(6),
-table td:nth-child(6) {
-  width: 10%; /* Keep Debit and Credit smaller */
-  
-}
+    table th:nth-child(3),
+    table td:nth-child(3),
+    table th:nth-child(6),
+    table td:nth-child(6) {
+      width: 10%;
+    }
 
-.filter-input {
-  width: 90%;
-}
-
+    .filter-input {
+      width: 90%;
+    }
 
     .filter-input {
       display: none;
@@ -577,9 +538,19 @@ table td:nth-child(6) {
       margin-top: 5px;
     }
   </style>
+  <style>
+    .navbar-nav .nav-item.active .nav-link {
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+    }
 
+    .navbar-nav .nav-item .nav-link:hover {
+      background-color: #0056b3;
+      color: white;
+    }
+  </style>
   <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
       <a class="navbar-brand" href="#">Ledger Book</a>
       <button
@@ -617,13 +588,9 @@ table td:nth-child(6) {
         </ul>
       </div>
     </nav>
-
-    <!-- Ledger Container -->
     <div class="container" id="ledgerContainer" style="display: none">
-      <!-- Ledger Section -->
       <div class="header-section">
         <div class="header-left" style="display: flex">
-          <!-- Book Input -->
           <div class="left-section">
             <div>
               <div>Book:</div>
@@ -662,8 +629,6 @@ table td:nth-child(6) {
           </div>
         </div>
       </div>
-
-      <!-- Ledger Table -->
       <table id="ledgerTable" class="table table-bordered">
         <thead>
           <tr>
@@ -682,8 +647,6 @@ table td:nth-child(6) {
       <button onclick="saveLedgerData()" class="btn btn-primary">
         Save Ledger Data
       </button>
-
-      <!-- Tracker Section -->
       <div class="tracker-container">
         <table class="expense-table">
           <thead>
@@ -695,9 +658,7 @@ table td:nth-child(6) {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="expense-table-body">
-            <!-- Table rows will be inserted here dynamically -->
-          </tbody>
+          <tbody id="expense-table-body"></tbody>
         </table>
       </div>
     </div>
