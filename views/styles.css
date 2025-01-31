@@ -107,11 +107,11 @@ body {
   padding: 0;
 }
 
-#ledgerTable tbody tr td:nth-child(2) {
+/* #ledgerTable tbody tr td:nth-child(2) {
   background-color: #ffe6e6;
   color: #ff0000;
   font-weight: bold;
-}
+} */
 
 #ledgerTable tbody tr td:nth-child(4) {
   background-color: #e6ffe6;

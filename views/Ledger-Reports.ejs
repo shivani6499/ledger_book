@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <title>Trial Balance</title> -->
     <link rel="stylesheet" href="Trial-Balance.css" />
     <link
       rel="stylesheet"
@@ -12,7 +11,6 @@
   </head>
 
   <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
       <a class="navbar-brand" href="#">Ledger Book</a>
       <button
@@ -50,9 +48,7 @@
         </ul>
       </div>
     </nav>
-    <!-- Voucher Section -->
     <div class="container mt-5">
-      <!-- Date Filter Form -->
       <form id="dateFilterForm" class="form-inline justify-content-center mt-4">
         <div class="form-group mx-2">
           <label for="fromDate" class="mr-2">From Date:</label>
@@ -61,6 +57,16 @@
         <div class="form-group mx-2">
           <label for="toDate" class="mr-2">To Date:</label>
           <input type="date" id="toDate" class="form-control" required />
+        </div>
+        <div class="form-group mx-2">
+          <label for="ledgerName" class="mr-2">Ledger Name:</label>
+          <input
+            type="text"
+            id="ledgerName"
+            class="form-control"
+            placeholder="Enter Ledger Name"
+            required
+          />
         </div>
         <button
           type="button"
@@ -71,79 +77,82 @@
         </button>
       </form>
 
-      <!-- Voucher Table -->
       <table class="table table-bordered mt-4">
         <thead>
           <tr>
-            <th>Particulars</th>
             <th>Narration</th>
             <th>Debit</th>
             <th>Credit</th>
             <th>Balance</th>
           </tr>
         </thead>
-        <tbody id="voucherTableBody">
-          <!-- Dynamic content will be inserted here -->
-        </tbody>
+        <tbody id="voucherTableBody"></tbody>
       </table>
     </div>
 
     <script>
-      // Function to fetch vouchers based on the selected date range
       function filterVouchers() {
         const fromDate = document.getElementById("fromDate").value;
         const toDate = document.getElementById("toDate").value;
-    
-        if (!fromDate || !toDate) {
-          alert("Please select both dates.");
+        const ledgerName = document.getElementById("ledgerName").value;
+
+        if (!fromDate || !toDate || !ledgerName) {
+          alert("Please fill in all fields.");
           return;
         }
-    
-        // API URL with query parameters
-        const apiUrl = `/api/voucher/grouped?startDate=${fromDate}&endDate=${toDate}`;
-    
-        // Fetch the data from the server
+
+        console.log("From Date:", fromDate);
+        console.log("To Date:", toDate);
+        console.log("Ledger Name:", ledgerName);
+        const apiUrl = `http://localhost:3001/api/ledger-reports?startDate=${fromDate}&endDate=${toDate}&ledgerName=${ledgerName}`;
+
         fetch(apiUrl)
           .then((response) => {
             if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
+              throw new Error("Error fetching data.");
             }
             return response.json();
           })
           .then((data) => {
             const tableBody = document.getElementById("voucherTableBody");
-            tableBody.innerHTML = ""; // Clear existing rows
-    
-            if (
-              data &&
-              data.groupedVouchers &&
-              data.groupedVouchers.length > 0
-            ) {
-              // Populate table rows with voucher data
+            tableBody.innerHTML = "";
+
+            if (data.groupedVouchers && data.groupedVouchers.length > 0) {
+              const openingBalanceData = data.groupedVouchers.shift();
+
+              const openingBalanceRow = `
+                  <tr>
+                    <td><strong>Opening Balance</strong></td>
+                    <td>0.00</td>
+                    <td>0.00</td>
+                    <td><strong>${parseFloat(
+                      openingBalanceData.balance
+                    ).toFixed(2)}</strong></td>
+                  </tr>
+                `;
+              tableBody.innerHTML += openingBalanceRow;
+
               data.groupedVouchers.forEach((voucher) => {
                 const row = `
-                <tr>
-                  <td>${voucher.particulars}</td>
-                  <td>${voucher.narration}</td> <!-- Corrected this line -->
-                  <td>${voucher.debit.toFixed(2)}</td>
-                  <td>${voucher.credit.toFixed(2)}</td>
-                  <td>${voucher.balance.toFixed(2)}</td>
-                </tr>
-              `;
+                    <tr>
+                      <td>${voucher.narration}</td>
+                      <td>${parseFloat(voucher.debit).toFixed(2)}</td>
+                      <td>${parseFloat(voucher.credit).toFixed(2)}</td>
+                      <td>${parseFloat(voucher.balance).toFixed(2)}</td>
+                    </tr>
+                  `;
                 tableBody.innerHTML += row;
               });
             } else {
-              // Show message if no vouchers are found
               tableBody.innerHTML =
-                "<tr><td colspan='5'>No vouchers found for the selected dates.</td></tr>";
+                "<tr><td colspan='4'>No vouchers found for the selected date range and ledger.</td></tr>";
             }
           })
           .catch((error) => {
-            console.error("Error fetching vouchers:", error);
-            alert("An error occurred while fetching the voucher data.");
+            console.error("Error:", error);
+            alert("An error occurred while fetching the data.");
           });
       }
     </script>
-    
   </body>
 </html>

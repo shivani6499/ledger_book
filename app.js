@@ -5,10 +5,10 @@ const session = require("express-session");
 const bcrypt = require("bcrypt");
 const path = require("path");
 const { Op } = require("sequelize");
-
 const app = express();
 const port = 3001;
-
+const cors = require("cors");
+app.use(cors());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "views")));
@@ -18,34 +18,27 @@ app.get("/trial-balance", (req, res) => {
 app.get("/trial-balance", (req, res) => {
   res.render("index");
 });
+
+app.get("/ledger-reports", (req, res) => {
+  res.render("Ledger-Reports");
+});
+
+app.get("/redirect-to-ledger", (req, res) => {
+  res.redirect("/ledger-reports");
+});
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Configure SQLite database using Sequelize
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: path.resolve(__dirname, "ledger.db"),
 });
 
-// Models
 const User = sequelize.define("User", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   username: { type: DataTypes.STRING, allowNull: false, unique: true },
   password: { type: DataTypes.STRING, allowNull: false },
 });
-
-// const Voucher = sequelize.define("Voucher", {
-//   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-//   book: { type: DataTypes.STRING, allowNull: false },
-//   pageNo: { type: DataTypes.INTEGER, allowNull: false },
-//   date: { type: DataTypes.DATE, allowNull: false },
-//   particulars: { type: DataTypes.STRING, allowNull: false },
-//   transactionType: { type: DataTypes.ENUM("D", "C"), allowNull: false }, // Debit or Credit
-//   amount: { type: DataTypes.FLOAT, allowNull: false },
-//   balance: { type: DataTypes.FLOAT, allowNull: false },
-//   lastModifiedBy: { type: DataTypes.STRING, allowNull: false },
-//   lastModifiedDate: { type: DataTypes.DATE, allowNull: false },
-// });
 
 const Ledger = sequelize.define("Ledger", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -57,33 +50,33 @@ const Ledger = sequelize.define("Ledger", {
 
 const TableEntry = sequelize.define("TableEntry", {
   particulars: { type: DataTypes.STRING, allowNull: true },
+  narration1: { type: DataTypes.STRING, allowNull: true },
   debit: { type: DataTypes.FLOAT, allowNull: true },
   particulars2: { type: DataTypes.STRING, allowNull: true },
+  narration2: { type: DataTypes.STRING, allowNull: true },
   credit: { type: DataTypes.FLOAT, allowNull: true },
   ledgerId: { type: DataTypes.INTEGER, allowNull: false },
 });
 
-// Relationships
+module.exports = TableEntry;
+
 Ledger.hasMany(TableEntry, { foreignKey: "ledgerId", as: "tableEntries" });
 TableEntry.belongsTo(Ledger, { foreignKey: "ledgerId", as: "ledger" });
 
-// Sync database
 sequelize
   .sync({ alter: true })
   .then(() => console.log("Database synchronized successfully."))
   .catch((error) => console.error("Database synchronization failed:", error));
 
-// Configure session middleware
 app.use(
   session({
-    secret: "shivani", // Use a secure, complex secret in production
+    secret: "shivani",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // Use secure: true with HTTPS
+    cookie: { secure: false },
   })
 );
 
-// Middleware for authentication
 const isAuthenticated = (req, res, next) => {
   if (req.session.userId) {
     return next();
@@ -91,7 +84,6 @@ const isAuthenticated = (req, res, next) => {
   res.status(401).json({ message: "Unauthorized" });
 };
 
-// Routes
 app.get("/login", (req, res) => res.render("login"));
 
 app.get("/register", (req, res) => res.render("register"));
@@ -128,9 +120,12 @@ const Voucher = sequelize.define("Voucher", {
   pageNo: { type: DataTypes.INTEGER, allowNull: false },
   date: { type: DataTypes.DATE, allowNull: false },
   particulars: { type: DataTypes.STRING, allowNull: false },
+  narration1: { type: DataTypes.STRING, allowNull: true },
+  narration2: { type: DataTypes.STRING, allowNull: true },
   particulars2: { type: DataTypes.STRING, allowNull: true },
   transactionType: { type: DataTypes.ENUM("D", "C"), allowNull: false },
   amount: { type: DataTypes.FLOAT, allowNull: false },
+  balance: { type: DataTypes.FLOAT, allowNull: false },
   lastModifiedBy: { type: DataTypes.STRING, allowNull: false },
   lastModifiedDate: { type: DataTypes.DATE, allowNull: false },
 });
@@ -144,13 +139,21 @@ app.post("/api/voucher", isAuthenticated, async (req, res) => {
         .status(401)
         .json({ message: "User not found or unauthorized." });
     }
-
     const ledgerData = await Ledger.findAll({
       include: {
         model: TableEntry,
         as: "tableEntries",
-        attributes: ["id", "particulars", "debit", "particulars2", "credit"],
+        attributes: [
+          "id",
+          "particulars",
+          "narration1",
+          "debit",
+          "particulars2",
+          "narration2",
+          "credit",
+        ],
       },
+      attributes: ["book", "pageNo", "date", "balance"],
     });
 
     if (!ledgerData || ledgerData.length === 0) {
@@ -161,32 +164,41 @@ app.post("/api/voucher", isAuthenticated, async (req, res) => {
 
     ledgerData.forEach((ledger) => {
       ledger.tableEntries.forEach((entry) => {
-        const { debit = 0, credit = 0, particulars, particulars2 } = entry;
-        const { book, pageNo, date } = ledger;
+        const {
+          debit = 0,
+          credit = 0,
+          particulars,
+          narration1,
+          narration2,
+          particulars2,
+        } = entry;
+        const { book, pageNo, date, balance } = ledger;
 
-        // Ensure that "particulars" has a value, fallback to "N/A" if not provided
         const safeParticulars = particulars || "N/A";
+        const safeParticulars2 = particulars2 || "N/A";
 
         if (debit > 0) {
-          // Debit Entry (Exclude particulars2)
           vouchers.push({
             book,
             pageNo,
             date,
-            particulars: safeParticulars, // Only safeParticulars here
+            balance,
+            particulars: safeParticulars,
+            narration1,
             transactionType: "D",
             amount: debit,
             lastModifiedBy: user.username,
             lastModifiedDate: new Date(),
           });
 
-          // Duplicate Entry with toggled transactionType and particulars as "Cash"
           vouchers.push({
             book,
             pageNo,
             date,
+            balance,
             particulars: "Cash",
-            transactionType: "C", // Toggle transactionType
+            narration1,
+            transactionType: "C",
             amount: debit,
             lastModifiedBy: user.username,
             lastModifiedDate: new Date(),
@@ -194,25 +206,27 @@ app.post("/api/voucher", isAuthenticated, async (req, res) => {
         }
 
         if (credit > 0) {
-          // Credit Entry (Include particulars2 if necessary)
           vouchers.push({
             book,
             pageNo,
             date,
-            particulars: particulars2, // Only safeParticulars here
+            balance,
+            particulars: safeParticulars2,
+            narration2,
             transactionType: "C",
             amount: credit,
             lastModifiedBy: user.username,
             lastModifiedDate: new Date(),
           });
 
-          // Duplicate Entry with toggled transactionType and particulars as "Cash"
           vouchers.push({
             book,
             pageNo,
             date,
+            balance,
             particulars: "Cash",
-            transactionType: "D", // Toggle transactionType
+            narration2,
+            transactionType: "D",
             amount: credit,
             lastModifiedBy: user.username,
             lastModifiedDate: new Date(),
@@ -228,18 +242,18 @@ app.post("/api/voucher", isAuthenticated, async (req, res) => {
       vouchers: createdVouchers,
     });
   } catch (error) {
-    console.error("Error creating vouchers:", error);
-    res.status(500).json({ error: "Failed to create vouchers." });
+    console.error("Error creating vouchers:", error.message);
+    res.status(500).json({
+      error: "Failed to create vouchers.",
+      details: error.message,
+    });
   }
 });
-
-// const { Op } = require("sequelize");
 
 app.get("/api/voucher/grouped", isAuthenticated, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
-    // Validate date inputs
     if (!startDate || !endDate) {
       return res.status(400).json({
         message:
@@ -247,49 +261,60 @@ app.get("/api/voucher/grouped", isAuthenticated, async (req, res) => {
       });
     }
 
-    // Fetch grouped data within the date range
     const vouchers = await Voucher.findAll({
       attributes: [
         "particulars",
         "transactionType",
-        [sequelize.fn("SUM", sequelize.col("amount")), "totalAmount"],
+        "narration1",
+        "narration2",
+        [sequelize.literal("COALESCE(SUM(amount), 0)"), "totalAmount"],
       ],
       where: {
         date: {
           [Op.between]: [new Date(startDate), new Date(endDate)],
         },
       },
-      group: ["particulars", "transactionType"],
+      group: ["particulars", "transactionType", "narration1", "narration2"],
       raw: true,
     });
 
     if (!vouchers || vouchers.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No vouchers found for the given date range." });
+      return res.status(404).json({
+        message: "No vouchers found for the given date range.",
+      });
     }
 
-    // Process the data to calculate balances
     const balanceMap = {};
     vouchers.forEach((voucher) => {
-      const { particulars, transactionType, totalAmount } = voucher;
+      const {
+        particulars,
+        narration1,
+        narration2,
+        transactionType,
+        totalAmount,
+      } = voucher;
+
+      const narration = narration1 || narration2 || "No narration";
+      const amount = parseFloat(totalAmount) || 0;
+
       if (!balanceMap[particulars]) {
-        balanceMap[particulars] = { debit: 0, credit: 0 };
+        balanceMap[particulars] = { debit: 0, credit: 0, narration };
       }
+
       if (transactionType === "D") {
-        balanceMap[particulars].debit += parseFloat(totalAmount);
+        balanceMap[particulars].debit += amount;
       } else if (transactionType === "C") {
-        balanceMap[particulars].credit += parseFloat(totalAmount);
+        balanceMap[particulars].credit += amount;
       }
     });
 
-    // Prepare the final grouped data with balances
     const groupedVouchers = Object.entries(balanceMap).map(
-      ([particulars, { debit, credit }]) => ({
+      ([particulars, { debit, credit, narration }]) => ({
         particulars,
-        debit,
-        credit,
-        balance: debit - credit,
+        narration,
+        debit: parseFloat(debit) || 0,
+        credit: parseFloat(credit) || 0,
+        balance: parseFloat(debit - credit) || 0,
       })
     );
 
@@ -297,6 +322,112 @@ app.get("/api/voucher/grouped", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error("Error fetching grouped vouchers:", error);
     res.status(500).json({ error: "Failed to fetch grouped vouchers." });
+  }
+});
+
+app.get("/api/ledger-reports", async (req, res) => {
+  try {
+    const { startDate, endDate, ledgerName } = req.query;
+    console.log(req.query, " req.query");
+
+    if (!startDate || !endDate || !ledgerName) {
+      return res.status(400).json({
+        message:
+          "Please provide startDate, endDate, and ledgerName in the query parameters.",
+      });
+    }
+
+    const openingBalanceEntry = await Voucher.findOne({
+      attributes: ["balance"],
+      where: {
+        particulars: ledgerName,
+        date: { [Op.lte]: new Date(endDate) },
+      },
+      order: [["date", "DESC"]],
+      raw: true,
+    });
+
+    console.log("🔍 Opening Balance Query Result:", openingBalanceEntry);
+
+    let openingBalance =
+      openingBalanceEntry && openingBalanceEntry.balance !== null
+        ? parseFloat(openingBalanceEntry.balance)
+        : 0;
+
+    console.log("Calculated Opening Balance:", openingBalance);
+
+    const vouchers = await Voucher.findAll({
+      attributes: [
+        "particulars",
+        "transactionType",
+        "narration1",
+        "narration2",
+        [Sequelize.fn("SUM", Sequelize.col("amount")), "totalAmount"],
+      ],
+      where: {
+        particulars: ledgerName,
+        date: { [Op.between]: [new Date(startDate), new Date(endDate)] },
+      },
+      group: ["particulars", "transactionType", "narration1", "narration2"],
+      raw: true,
+    });
+
+    console.log("Fetched Vouchers:", vouchers);
+
+    if (!vouchers || vouchers.length === 0) {
+      return res.status(404).json({
+        message: "No vouchers found for the given date range and ledger.",
+      });
+    }
+
+    let runningBalance = openingBalance;
+    const groupedVouchers = [];
+
+    groupedVouchers.push({
+      particulars: ledgerName,
+      narration: "Opening Balance",
+      debit: 0.0,
+      credit: 0.0,
+      balance: openingBalance,
+    });
+
+    vouchers.forEach((voucher) => {
+      const {
+        particulars,
+        narration1,
+        narration2,
+        transactionType,
+        totalAmount,
+      } = voucher;
+      const narration = narration1 || narration2 || "No narration";
+      const amount = totalAmount ? parseFloat(totalAmount) : 0;
+
+      let debit = 0,
+        credit = 0;
+
+      if (transactionType === "D") {
+        debit = amount;
+        runningBalance += amount;
+      } else if (transactionType === "C") {
+        credit = amount;
+        runningBalance -= amount;
+      }
+
+      groupedVouchers.push({
+        particulars,
+        narration,
+        debit,
+        credit,
+        balance: runningBalance,
+      });
+    });
+
+    console.log("Final Ledger Report:", groupedVouchers);
+
+    res.status(200).json({ groupedVouchers });
+  } catch (error) {
+    console.error("Error fetching ledger reports:", error);
+    res.status(500).json({ error: "Failed to fetch ledger reports." });
   }
 });
 
@@ -390,7 +521,6 @@ app.post("/api/save-ledger", async (req, res) => {
       ledger.balance = balance;
       ledger.date = date;
       await ledger.save();
-
       console.log("Ledger updated:", ledger);
     } else {
       ledger = await Ledger.create({ book, pageNo, balance, date });
@@ -400,15 +530,24 @@ app.post("/api/save-ledger", async (req, res) => {
     const tableEntryData = [];
 
     for (const entry of tableEntries) {
-      const { particulars, debit, particulars2, credit } = entry;
+      const {
+        particulars,
+        narration1,
+        debit,
+        particulars2,
+        narration2,
+        credit,
+      } = entry;
 
       let existingEntry = await TableEntry.findOne({
         where: {
           ledgerId: ledger.id,
-          particulars: particulars,
-          particulars2: particulars2,
-          debit: debit,
-          credit: credit,
+          particulars,
+          narration1,
+          debit,
+          particulars2,
+          narration2,
+          credit,
         },
       });
 
@@ -416,16 +555,20 @@ app.post("/api/save-ledger", async (req, res) => {
         const tableEntry = await TableEntry.create({
           ledgerId: ledger.id,
           particulars: particulars || null,
+          narration1: narration1 || null, // Fixed: Added narration1
           debit: debit !== undefined ? debit : null,
           particulars2: particulars2 || null,
+          narration2: narration2 || null, // Fixed: Added narration2
           credit: credit !== undefined ? credit : null,
         });
 
         tableEntryData.push(tableEntry);
       } else {
         existingEntry.particulars = particulars || null;
+        existingEntry.narration1 = narration1 || null; // Fixed: Update narration1
         existingEntry.debit = debit !== undefined ? debit : null;
         existingEntry.particulars2 = particulars2 || null;
+        existingEntry.narration2 = narration2 || null; // Fixed: Update narration2
         existingEntry.credit = credit !== undefined ? credit : null;
         await existingEntry.save();
 
@@ -435,7 +578,7 @@ app.post("/api/save-ledger", async (req, res) => {
 
     res.status(200).json({
       message: "Ledger data saved successfully!",
-      ledger: ledger,
+      ledger,
       tableEntries: tableEntryData,
     });
   } catch (error) {
@@ -445,11 +588,10 @@ app.post("/api/save-ledger", async (req, res) => {
       .json({ message: "Error saving ledger data.", error: error.message });
   }
 });
+
 app.get("/api/ledger-data", async (req, res) => {
   try {
     const { fromDate, toDate } = req.query;
-
-    // Validate the date range
     if (!fromDate || !toDate) {
       return res
         .status(400)
@@ -458,7 +600,6 @@ app.get("/api/ledger-data", async (req, res) => {
 
     console.log("Fetching data from:", fromDate, "to:", toDate);
 
-    // Fetch ledger entries within the date range
     const ledgers = await Ledger.findAll({
       where: {
         date: {
@@ -467,8 +608,8 @@ app.get("/api/ledger-data", async (req, res) => {
       },
       include: [
         {
-          model: TableEntry, // Assuming TableEntry is associated with Ledger
-          as: "tableEntries", // Alias should match the association name in your Sequelize models
+          model: TableEntry,
+          as: "tableEntries",
         },
       ],
     });
@@ -541,24 +682,20 @@ app.patch("/api/update-ledger-entry/:id", async (req, res) => {
     });
 
     if (updatedRowsCount === 0) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Entry not found or no changes made",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Entry not found or no changes made",
+      });
     }
 
     res.json({ success: true, message: "Ledger entry updated successfully" });
   } catch (error) {
     console.error("Error updating ledger entry:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error updating ledger entry",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error updating ledger entry",
+      error: error.message,
+    });
   }
 });
 
@@ -572,7 +709,14 @@ app.get("/api/ledger/:book/:pageNo", async (req, res) => {
         {
           model: TableEntry,
           as: "tableEntries",
-          attributes: ["debit", "credit", "particulars", "particulars2"],
+          attributes: [
+            "debit",
+            "credit",
+            "narration1",
+            "narration2",
+            "particulars",
+            "particulars2",
+          ],
         },
       ],
     });
@@ -635,7 +779,15 @@ app.get("/api/ledger/all", async (req, res) => {
         {
           model: TableEntry,
           as: "tableEntries",
-          attributes: ["id", "particulars", "debit", "particulars2", "credit"],
+          attributes: [
+            "id",
+            "particulars",
+            "narration1",
+            "debit",
+            "particulars2",
+            "narration1",
+            "credit",
+          ],
         },
       ],
     });

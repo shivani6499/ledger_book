@@ -123,13 +123,13 @@
       padding: 0;
     }
 
-    #ledgerTable tbody tr td:nth-child(2) {
+    #ledgerTable tbody tr td:nth-child(3) {
       background-color: #ffe6e6;
       color: #ff0000;
       font-weight: bold;
     }
 
-    #ledgerTable tbody tr td:nth-child(4) {
+    #ledgerTable tbody tr td:nth-child(6) {
       background-color: #e6ffe6;
       color: #008000;
       font-weight: bold;
@@ -540,35 +540,32 @@
         margin-bottom: 10px;
       }
     }
-
     table th:nth-child(1),
-    table td:nth-child(1) {
-      width: 30%;
-    }
+table td:nth-child(1),
+table th:nth-child(4),
+table td:nth-child(4) {
+  width: 21%; /* Increase width for "Particulars" columns */
+}
 
-    table th:nth-child(2),
-    table td:nth-child(2) {
-      width: 10%;
-    }
+table th:nth-child(2),
+table td:nth-child(2),
+table th:nth-child(5),
+table td:nth-child(5) {
+  width: 10%; /* Keep Narration smaller */
+}
 
-    table th:nth-child(3),
-    table td:nth-child(3) {
-      width: 30%;
-    }
+table th:nth-child(3),
+table td:nth-child(3),
+table th:nth-child(6),
+table td:nth-child(6) {
+  width: 10%; /* Keep Debit and Credit smaller */
+  
+}
 
-    table th:nth-child(4),
-    table td:nth-child(4) {
-      width: 10%;
-    }
+.filter-input {
+  width: 90%;
+}
 
-    table th:nth-child(5),
-    table td:nth-child(5) {
-      width: 10%;
-    }
-
-    .filter-input {
-      width: 90%;
-    }
 
     .filter-input {
       display: none;
@@ -610,6 +607,11 @@
           <li class="nav-item">
             <a class="nav-link" href="/trial-balance" style="color: white"
               >Trial Balance</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/Ledger-Reports" style="color: white"
+              >Ledger Reports</a
             >
           </li>
         </ul>
@@ -666,8 +668,10 @@
         <thead>
           <tr>
             <th>Particulars</th>
+            <th>Narration</th>
             <th>Debit</th>
             <th>Particulars 2</th>
+            <th>Narration</th>
             <th>Credit</th>
           </tr>
         </thead>

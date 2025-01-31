@@ -80,6 +80,7 @@ const renderTable = (data) => {
   });
 };
 
+
 const viewDetails = async (book, pageNo) => {
   try {
     console.log(`Requesting details for book: ${book}, page: ${pageNo}`);
@@ -138,7 +139,7 @@ const deleteLedgerEntry = async (book, pageNo) => {
     try {
       // Send a DELETE request to your backend API
       const response = await fetch(
-        `http://localhost:3000/api/delete-page/${book}/${pageNo}`,
+        `http://localhost:3001/api/delete-page/${book}/${pageNo}`,
         {
           method: "DELETE",
         }
@@ -200,21 +201,17 @@ function createRow(entry) {
   const row = document.createElement("tr");
 
   row.innerHTML = `
-      <td contenteditable="true" onblur="updateEntry(${
-        entry.id
-      }, 'particulars', this.innerText)">${entry.particulars || ""}</td>
-      <td contenteditable="true" onblur="updateEntry(${
-        entry.id
-      }, 'debit', this.innerText)">${entry.debit || 0}</td>
-      <td contenteditable="true" onblur="updateEntry(${
-        entry.id
-      }, 'particulars2', this.innerText)">${entry.particulars2 || ""}</td>
-      <td contenteditable="true" onblur="updateEntry(${
-        entry.id
-      }, 'credit', this.innerText)">${entry.credit || 0}</td>
-    `;
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'particulars', this.innerText)">${entry.particulars || ""}</td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'narration1', this.innerText)">${entry.narration1 || ""}</td>  <!-- Fix Here -->
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'debit', this.innerText)">${entry.debit || 0}</td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'particulars2', this.innerText)">${entry.particulars2 || ""}</td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'narration2', this.innerText)">${entry.narration2 || ""}</td> <!-- Fix Here -->
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'credit', this.innerText)">${entry.credit || 0}</td>
+  `;
+
   return row;
 }
+
 
 // Function to add a new row to the table
 function addNewRow() {
@@ -226,6 +223,10 @@ function addNewRow() {
     <td contenteditable="true" onkeydown="handleKeyPress(event, this)"></td>
     <td contenteditable="true" onkeydown="handleKeyPress(event, this)"></td>
     <td contenteditable="true" onkeydown="handleKeyPress(event, this)"></td>
+    <td contenteditable="true" onkeydown="handleKeyPress(event, this)"></td>
+    <td contenteditable="true" onkeydown="handleKeyPress(event, this)"></td>
+    
+    
   `;
 
   tbody.appendChild(row);
@@ -247,33 +248,44 @@ function handleKeyPress(event, cell) {
     }
   }
 }
-
 function createRow(entry) {
   const row = document.createElement("tr");
 
   row.innerHTML = `
-    <td contenteditable="true" onblur="updateEntry(${
-      entry.id
-    }, 'particulars', this.innerText)">${entry.particulars || ""}</td>
-    <td contenteditable="true" onblur="updateEntry(${
-      entry.id
-    }, 'debit', this.innerText)">${entry.debit || 0}</td>
-    <td contenteditable="true" onblur="updateEntry(${
-      entry.id
-    }, 'particulars2', this.innerText)">${entry.particulars2 || ""}</td>
-    <td contenteditable="true" onblur="updateEntry(${
-      entry.id
-    }, 'credit', this.innerText)">${entry.credit || 0}</td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'particulars', this.innerText)">
+      ${entry.particulars || ""}
+    </td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'narration1', this.innerText)">
+      ${entry.narration1 || ""}
+    </td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'debit', this.innerText)">
+      ${entry.debit || 0}
+    </td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'particulars2', this.innerText)">
+      ${entry.particulars2 || ""}
+    </td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'narration2', this.innerText)">
+      ${entry.narration2 || ""}
+    </td>
+    <td contenteditable="true" onblur="updateEntry(${entry.id}, 'credit', this.innerText)">
+      ${entry.credit || 0}
+    </td>
   `;
+
   return row;
 }
+
 // Function to update an individual entry
 const updateEntry = (entryId, field, newValue) => {
+  console.log(entryId,"entryId")
+  console.log(field,"field")
+  console.log(newValue,"newValue")
+  console.log("shivannni")
   // Validate inputs
-  if (!entryId || !field) {
-    console.error("Invalid entry ID or field to update");
-    return;
-  }
+  // if (!entryId || !field) {
+  //   console.error("Invalid entry ID or field to update");
+  //   return;
+  // }
 
   fetch(`/api/update-ledger-entry/${entryId}`, {
     method: "PATCH",
@@ -301,22 +313,25 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function saveLedgerData() {
-  const book = document.getElementById("bookInput").value;
-  const pageNo = document.getElementById("pageInput").value;
-  const balance = document.getElementById("balanceInput").value;
-  const date = document.getElementById("dateInput").value;
+  const book = document.getElementById("bookInput").value.trim();
+  const pageNo = document.getElementById("pageInput").value.trim();
+  const balance = document.getElementById("balanceInput").value.trim();
+  const date = document.getElementById("dateInput").value.trim();
 
   const tableEntries = [];
   const rows = document.querySelectorAll("#ledgerTableBody tr");
 
   rows.forEach((row) => {
     tableEntries.push({
-      particulars: row.cells[0].innerText,
-      debit: row.cells[1].innerText || 0,
-      particulars2: row.cells[2].innerText,
-      credit: row.cells[3].innerText || 0,
+      particulars: row.cells[0].innerText.trim(),
+      narration1: row.cells[1].innerText.trim(), // Ensure narration1 is collected
+      debit: row.cells[2].innerText.trim() || 0,
+      particulars2: row.cells[3].innerText.trim(),
+      narration2: row.cells[4].innerText.trim(), // Ensure narration2 is collected
+      credit: row.cells[5].innerText.trim() || 0,
     });
   });
+  
 
   const payload = { book, pageNo, balance, date, tableEntries };
 
