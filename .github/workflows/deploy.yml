@@ -1,0 +1,29 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install SSH Client
+      run: sudo apt-get install -y sshpass
+
+    - name: Deploy to AWS EC2
+      run: |
+        sshpass -p "${{ secrets.AWS_PASS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+          cd ~/app || git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git ~/app && cd ~/app
+          git pull origin main
+          docker stop my-app || true
+          docker rm my-app || true
+          docker rmi my-app || true
+          docker build -t my-app .
+          docker run -d -p 3000:3000 --name my-app my-app
+        EOF
