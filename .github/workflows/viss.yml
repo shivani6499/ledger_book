@@ -1,0 +1,48 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install SSH Client
+      run: sudo apt-get install -y sshpass
+
+    - name: Deploy to AWS EC2
+      run: |
+        sshpass -p "${{ secrets.AWS_PASS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+          echo "Updating system..."
+          sudo apt update && sudo apt upgrade -y
+
+          echo "Installing dependencies..."
+          sudo apt install -y docker.io git unzip nodejs npm
+
+          echo "Allowing Docker to run without sudo..."
+          sudo usermod -aG docker $USER
+          newgrp docker
+
+          echo "Setting up firewall..."
+          sudo ufw allow 3000
+          sudo ufw enable
+
+          echo "Cloning or updating repository..."
+          cd ~/app || git clone git@github.com:shivani6499/ledger_book.git ~/app && cd ~/app
+          git pull origin main
+
+          echo "Stopping old Docker containers..."
+          sudo docker stop my-app || true
+          sudo docker rm my-app || true
+          sudo docker rmi my-app || true
+
+          echo "Building and running Docker container..."
+          sudo docker build -t my-app .
+          sudo docker run -d -p 3000:3000 --name my-app my-app
+        EOF
